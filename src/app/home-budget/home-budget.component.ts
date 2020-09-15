@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NgxEchartsModule } from 'ngx-echarts';
 
+import { HttpClient } from "@angular/common/http";
+
+ 
+
 @Component({
   selector: 'app-home-budget',
   templateUrl: './home-budget.component.html',
@@ -9,6 +13,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
 export class HomeBudgetComponent implements OnInit {
   title = "HomeBudget";
   showBar = true;
+  showExpenseDetail=true;
   public option;
   public optionPie;
   public clickAdd=false;
@@ -21,9 +26,13 @@ export class HomeBudgetComponent implements OnInit {
     {category:"Rent",value:"$213"},
     {category:"utilitiest",value:"$211"}]
 
-  constructor() { }
+  constructor(private http:HttpClient){}
+  public anyList:any
 
   ngOnInit(): void {
+    this.http.get("/assets/demo.json")
+   .subscribe(res=>{ this.anyList = res })
+
     this.option = {
       tooltip: {},
       legend: {
@@ -80,7 +89,13 @@ export class HomeBudgetComponent implements OnInit {
       ]
     };
   }
-
+  handleVisibleRent() {
+    if(this.showExpenseDetail) {
+      this.showExpenseDetail = false
+    }else {
+      this.showExpenseDetail = true
+    }
+  }
   isBar() {    
     this.showBar = true;
   }
@@ -88,6 +103,8 @@ export class HomeBudgetComponent implements OnInit {
     this.showBar=false; 
   }
   keyUp(){
-    this.clickAdd=true;
+    // this.clickAdd=true;
+    let newData = {categroy:"expenses",value:2};
+    this.categories.push(newData)
   }
 }
