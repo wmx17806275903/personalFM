@@ -2,15 +2,18 @@
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
         <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">HomeBudget</a>
 </nav>
-<div class="container-fluid">
+<div class="container-fluid" style="margin-top:10px;">
       <div class="row" style="display:flex;justify-content: space-between;">
+
         <div class="col-2">
+          <input type="date" id="date" style="height:40px;width:100%;" value={{date}}/>
           <div class="card">
             <ul class="list-group list-group-flush" *ngFor="let eachCategory of categories">
               <li class="list-group-item" style="display:flex;justify-content: space-between;">
               <input contentEditable="true" value={{eachCategory.categroy}} style="border:none;max-width:130px"  />
               <input style="margin-top:5px;" contentEditable="true" value={{eachCategory.value}} style="border:none;min-width:20px" />
               </li>
+              <!--first version to add categories.
               <li class="nav-item" style="display:flex;justify-content: space-between;" *ngIf="clickAdd">
                   <a class="nav-link active dropdown-toggle ">
                     <span data-feather="home"></span>
@@ -18,76 +21,57 @@
                   </a>
                   <a style="margin-top:5px;"><input type="text" value="value"></a>
               </li>
+              -->
             </ul>
             <button type="button" class="btn btn-dark" (click)="keyUp()">Add</button>
-          </div>              
+          </div>
+          <div style="text-align:center;">
+            <span>Available</span>
+            <br/><a>$292.3</a>
+            <br/><a>Expense as % of Budget</a>
+          </div>
+          <div style="height:40%" echarts [options]="budgetUsage"></div>  
+          <button type="button" class="btn btn-dark" style="margin-left:10px;"><a class="nav-link" routerLink="/report" style="color:white">Report</a></button>            
         </div>
-        
+
         <div class="col-6">
-            <input type="button" value="bar" (click)="isBar()">
+            <input class="btn btn-outline-dark" type="button" value="bar" (click)="isBar()">
             
-            <input type="button" value="pie" (click)="showPie()">
-            
+            <input class="btn btn-outline-dark" type="button" value="pie" (click)="showPie()" style="margin-left:5px;">
+            <div class="card"></div>
             <div id="main" *ngIf="showBar" echarts [options]="option"></div>
             <div id="pan" *ngIf="!showBar" echarts [options]="optionPie"></div>
         </div>
 
         <div class="col-4">
         
-            <input type="button" value="By Catagory">
-            <input type="button" value="By Date">
-            <div class="accordion" id="accordionExample">
-              <div class="card">
-                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
-                  <div class="card-body">
-                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                  </div>
-                </div>
-              </div>
-            </div>
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <input class="btn btn-outline-dark" type="button" value="By Catagory">
+            <input class="btn btn-outline-dark" type="button" value="By Date" style="margin-left:5px;">
+            <div class="card"></div>
 
-            <button class="btn btn-primary" (click)="handleVisibleRent()">Rent</button>
-            <button class="btn btn-primary" type="button" style="text-align:center;">+</button>
-            </h6>
             <div class="row">
               <div class="col">
               <div class="" id="multiCollapseExample1">
-                <ul class="nav flex-column mb-2">
-                    <li class="nav-item" style="display:flex;justify-content: space-between;" *ngIf="showBar">
-                      <a class="nav-link active" href="#">
-                        <span data-feather="home"></span>
-                        houseFee <span class="sr-only">(current)</span>
-                      </a>
-                        <a>0</a>
-                    </li>
-                </ul>
-            
+                <ul class="nav flex-column mb-2" *ngFor="let item of details">
+                  <li class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted btn btn-dark dropdown-toggle" (click)="handleVisibleRent($event)" id="{{$index}}">                             
+                    <a style="color:#fff;">{{item.category}}</a>
+                    <a style="color:#fff;">+</a>                    
+                  </li>
+                  <div class="card">
+                    <ul class="list-group list-group-flush" *ngFor="let detail of item.insideItems">
+                      <li class="list-group-item nav-item" style="display:flex;justify-content: space-between;" *ngIf="showExpenseDetail">
+                        <a class="nav-link active" href="#">
+                          <span data-feather="home"></span>
+                          {{detail.category}} <span class="sr-only">(current)</span>
+                        </a>
+                          <a>{{detail.value}}</a>
+                      </li>
+                    </ul>
+                  </div>
+                </ul>            
               </div>
               </div>
             </div>
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-            <span>Utilities</span>
-            <button class="btn btn-primary" type="button" style="text-align:center;">+</button>
-            </h6>
-            <ul class="nav flex-column mb-2">
-                <li class="nav-item" style="display:flex;justify-content: space-between;">
-                  <a class="nav-link active" href="#">
-                    <span data-feather="home"></span>
-                    water <span class="sr-only">(current)</span>
-                  </a>
-                    <a>0</a>
-                </li>
-                <li class="nav-item" style="display:flex;justify-content: space-between;">
-                  <a class="nav-link active" href="#">
-                    <span data-feather="home"></span>
-                    power <span class="sr-only">(current)</span>
-                  </a>
-                    <a>0</a>
-                </li>
-            </ul>
         </div>
       </div>
 </div>
-<button type="button" class="btn btn-dark"><a class="nav-link" routerLink="/report">Report</a></button>
-    

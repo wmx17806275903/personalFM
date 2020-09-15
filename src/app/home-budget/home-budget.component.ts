@@ -3,8 +3,6 @@ import { NgxEchartsModule } from 'ngx-echarts';
 
 import { HttpClient } from "@angular/common/http";
 
- 
-
 @Component({
   selector: 'app-home-budget',
   templateUrl: './home-budget.component.html',
@@ -16,22 +14,29 @@ export class HomeBudgetComponent implements OnInit {
   showExpenseDetail=true;
   public option;
   public optionPie;
+  public budgetUsage;
+  public anyList:any;
   public clickAdd=false;
+  public date;
   public categories:object[]=[
     {categroy:"expenses",value:2},
     {categroy:"budget",value:3},
     {categroy:"income",value:4}
   ];
   public details:object[]=[
-    {category:"Rent",value:"$213"},
-    {category:"utilitiest",value:"$211"}]
+    {category:"Rent",insideItems:[{category:"Mortage",value:"$1700"}],value:"$1700"},
+    {category:"utilitiest",insideItems:[{category:"Electricity",value:"$300"},{category:"Water",value:"$100"}],value:"$211"}
+  ];
 
   constructor(private http:HttpClient){}
-  public anyList:any
 
   ngOnInit(): void {
-    this.http.get("/assets/demo.json")
-   .subscribe(res=>{ this.anyList = res })
+    this.date=new Date();
+    this.http.get("http://106.15.238.105:8080/budget/details")//"/assets/demo.json"
+   .subscribe(res=>{ 
+     this.anyList = res;
+     console.log(res);
+   })
 
     this.option = {
       tooltip: {},
@@ -88,8 +93,44 @@ export class HomeBudgetComponent implements OnInit {
         }
       ]
     };
+    this.budgetUsage = { 
+      series: [
+        {
+            name: '业务指标',
+            type: 'gauge',  
+            center:['50%', '40%'],        
+            axisLine: {
+	            lineStyle: {//仪表盘轴线相关配置。
+	                width:5,
+	            }
+	        },
+	        splitLine: {//分隔线样式相关
+	            length: 10,//分割线的长度
+	            lineStyle: {
+	                width:1,
+	                color:'#b0b3b8'
+	            }
+	        },
+          data: [{value: 10, name: '%'}],   
+	        detail: {//仪表盘详情数据相关
+	            textStyle: {
+                    color: '#5bdbff',
+                    fontSize:16,
+                    offsetCenter: [0,'80%']
+               }
+	        },
+	        
+	        pointer:{//指针长度与宽度
+	            width:3,
+	            length:'85%'
+	        },
+        }
+    ]      
+    };
   }
-  handleVisibleRent() {
+  handleVisibleRent(event:Event) {
+    event.stopPropagation();
+    event.preventDefault();
     if(this.showExpenseDetail) {
       this.showExpenseDetail = false
     }else {
