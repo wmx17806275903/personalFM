@@ -21,6 +21,7 @@
     "@angular/router": "~10.1.1",
     "angular8": "0.0.1",
     "bootstrap": "^4.5.2",
+    "date-fns": "^2.16.1",
     "echarts": "^4.9.0",
     "mito": "^1.0.5",
     "ngx-echarts": "^5.1.2",

@@ -2,16 +2,16 @@
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
         <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">HomeBudget</a>
 </nav>
-<div class="container-fluid" style="margin-top:10px;">
+<div class="container-fluid light" style="margin-top:10px;">
       <div class="row" style="display:flex;justify-content: space-between;">
 
-        <div class="col-2">
-          <input type="date" id="date" style="height:40px;width:100%;" value={{date}}/>
+        <div class="col-2 sidebar-sticky pt-3 bg-light">
+          <input type="date" id="date" style="height:40px;width:100%;" value={{day}} date-date-format="MM/dd/yyyy"/>
           <div class="card">
-            <ul class="list-group list-group-flush" *ngFor="let eachCategory of categories">
+            <ul class="list-group list-group-flush" *ngFor="let category of home">
               <li class="list-group-item" style="display:flex;justify-content: space-between;">
-              <input contentEditable="true" value={{eachCategory.categroy}} style="border:none;max-width:130px"  />
-              <input style="margin-top:5px;" contentEditable="true" value={{eachCategory.value}} style="border:none;min-width:20px" />
+              <input contentEditable="true" value={{category.name}} style="border:none;max-width:130px"  />
+              <a style="margin-top:5px;" contentEditable="false" style="border:none;min-width:20px">${{category.value}}</a>
               </li>
               <!--first version to add categories.
               <li class="nav-item" style="display:flex;justify-content: space-between;" *ngIf="clickAdd">
@@ -23,52 +23,68 @@
               </li>
               -->
             </ul>
+            <!--
             <button type="button" class="btn btn-dark" (click)="keyUp()">Add</button>
+            -->
           </div>
-          <div style="text-align:center;">
+          <div style="text-align:center;margin-top:20px">
             <span>Available</span>
             <br/><a>$292.3</a>
             <br/><a>Expense as % of Budget</a>
           </div>
-          <div style="height:40%" echarts [options]="budgetUsage"></div>  
-          <button type="button" class="btn btn-dark" style="margin-left:10px;"><a class="nav-link" routerLink="/report" style="color:white">Report</a></button>            
+          <div style="height:40%" echarts [options]="budgetUsage"></div> 
+            <button class="btn btn-outline-dark" routerLink="/report" style="margin-top:-220px;">Report</button>            
         </div>
 
-        <div class="col-6">
+        <div class="col-6 sidebar-sticky pt-3">
             <input class="btn btn-outline-dark" type="button" value="bar" (click)="isBar()">
             
-            <input class="btn btn-outline-dark" type="button" value="pie" (click)="showPie()" style="margin-left:5px;">
+            <input class="btn btn-outline-dark" type="button" value="pie" (click)="isPie()" style="margin-left:5px;">
             <div class="card"></div>
             <div id="main" *ngIf="showBar" echarts [options]="option"></div>
             <div id="pan" *ngIf="!showBar" echarts [options]="optionPie"></div>
         </div>
 
-        <div class="col-4">
-        
-            <input class="btn btn-outline-dark" type="button" value="By Catagory">
-            <input class="btn btn-outline-dark" type="button" value="By Date" style="margin-left:5px;">
+
+        <div class="col-4 sidebar-sticky pt-3">
+            <input class="btn btn-outline-dark" type="button" value="By Catagory" (click)="isCategory()">
+            <input class="btn btn-outline-dark" type="button" value="By Date" (click)="isDate()" style="margin-left:5px;">
             <div class="card"></div>
 
             <div class="row">
               <div class="col">
-              <div class="" id="multiCollapseExample1">
-                <ul class="nav flex-column mb-2" *ngFor="let item of details">
-                  <li class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted btn btn-dark dropdown-toggle" (click)="handleVisibleRent($event)" id="{{$index}}">                             
-                    <a style="color:#fff;">{{item.category}}</a>
-                    <a style="color:#fff;">+</a>                    
+              <div id="multiCollapseExample1" *ngIf="showCategory">
+                <ul class="nav flex-column mb-2" *ngFor="let item of expenseDetail">
+                  <li class="sidebar-heading d-flex justify-content-between align-items-center btn btn-dark dropdown-toggle" (click)="handleVisibleRent($event)" id="{{$index}}">                             
+                    <a style="color:#fff;">{{item.categoryName}}</a>
+                    <!--
+                    <a style="color:#fff;">+</a>  
+                    -->                  
                   </li>
-                  <div class="card">
-                    <ul class="list-group list-group-flush" *ngFor="let detail of item.insideItems">
-                      <li class="list-group-item nav-item" style="display:flex;justify-content: space-between;" *ngIf="showExpenseDetail">
-                        <a class="nav-link active" href="#">
+                  <div class="card" *ngIf="showExpenseDetail">
+                    <ul class="list-group list-group-flush" *ngFor="let detail of item.expenseItems">
+                      <li class="list-group-item nav-item" style="display:flex;justify-content: space-between;" >
+                        <a class="nav-link active">
                           <span data-feather="home"></span>
-                          {{detail.category}} <span class="sr-only">(current)</span>
+                          {{detail.categoryName}} <span class="sr-only">(current)</span>
                         </a>
-                          <a>{{detail.value}}</a>
+                          <a>${{detail.value}}</a>
                       </li>
                     </ul>
                   </div>
-                </ul>            
+                </ul>                          
+              </div>
+              <div *ngIf="!showCategory">
+                <ul class="nav flex-column" *ngFor="let item of expenseDetail">
+                <a *ngFor="let detail of item.expenseItems">
+                  <li class="btn btn-dark" style="display:flex;justify-content: space-between;"> 
+                    <a>{{detail.date}}</a>                            
+                    <a>{{detail.categoryName}}</a>
+                    <a>${{detail.value}}</a>                                   
+                  </li>
+                  <br/>
+                  </a>
+                </ul> 
               </div>
               </div>
             </div>

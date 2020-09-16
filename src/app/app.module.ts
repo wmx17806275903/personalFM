@@ -7,7 +7,7 @@ import { HomeBudgetComponent } from './home-budget/home-budget.component';
 import {NgxEchartsModule} from 'ngx-echarts';
 import { ReportComponent } from './report/report.component';
 import {HttpClientModule} from "@angular/common/http"; //引入HttpClientModule 模块
-
+import {HttpDomainService} from "./services/http-domain.service";
 
 // import * as echarts from "echarts";
 @NgModule({
@@ -24,7 +24,7 @@ import {HttpClientModule} from "@angular/common/http"; //引入HttpClientModule 
     NgxEchartsModule.forRoot({echarts:()=>import("echarts"),
   })
   ],
-  providers: [],
+  providers: [HttpDomainService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

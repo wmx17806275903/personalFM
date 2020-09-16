@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {HttpDomainService} from "../services/http-domain.service";
 
 @Component({
   selector: 'app-report',
@@ -7,10 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ReportComponent implements OnInit {
 
+  public home;
   public option;
-  constructor() { }
+  constructor(public httpDomain:HttpDomainService) { }
 
   ngOnInit(): void {
+    var api_home="/home"
+    this.httpDomain.get(api_home).then((response)=>{
+      this.home=response;
+    })
     this.option = {
       tooltip: {},
       legend: {

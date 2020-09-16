@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgxEchartsModule } from 'ngx-echarts';
 
-import { HttpClient } from "@angular/common/http";
+import { DateTimes } from '../utils/date-time';
+import {HttpDomainService} from "../services/http-domain.service";
 
 @Component({
   selector: 'app-home-budget',
@@ -9,15 +10,19 @@ import { HttpClient } from "@angular/common/http";
   styleUrls: ['./home-budget.component.css']
 })
 export class HomeBudgetComponent implements OnInit {
-  title = "HomeBudget";
-  showBar = true;
-  showExpenseDetail=true;
+  public title = "HomeBudget";
+  public showBar = true;
+  public showCategory=true;
+  public showExpenseDetail=false;
   public option;
   public optionPie;
   public budgetUsage;
-  public anyList:any;
+  public expenseDetail;
+  public home:any;
   public clickAdd=false;
-  public date;
+  public day : string;
+  public xData:any[]=[];
+  public yData:any[]=[];
   public categories:object[]=[
     {categroy:"expenses",value:2},
     {categroy:"budget",value:3},
@@ -28,29 +33,41 @@ export class HomeBudgetComponent implements OnInit {
     {category:"utilitiest",insideItems:[{category:"Electricity",value:"$300"},{category:"Water",value:"$100"}],value:"$211"}
   ];
 
-  constructor(private http:HttpClient){}
+  constructor(public httpDomain:HttpDomainService){}
 
   ngOnInit(): void {
-    this.date=new Date();
-    this.http.get("http://106.15.238.105:8080/budget/details")//"/assets/demo.json"
-   .subscribe(res=>{ 
-     this.anyList = res;
-     console.log(res);
-   })
+    this.day=DateTimes.format(new Date(),'yyyy-MM-dd');
+
+    var api_expense="expenses/details"
+    const xy: any[] = [];
+    this.httpDomain.get(api_expense).then((response)=>{
+      this.expenseDetail=response;
+      //console.log(this.expenseDetail)
+      for(var i=0;i<this.expenseDetail.length;i++){
+        xy.push({ name: this.expenseDetail[i]["categoryName"], value: this.expenseDetail[i]["totalValue"] });
+        this.xData.push(this.expenseDetail[i]["categoryName"]);
+        this.yData.push(this.expenseDetail[i]["totalValue"]);
+      }
+      console.log(xy)
+    })
+    var api_home="/home"
+    this.httpDomain.get(api_home).then((response)=>{
+      this.home=response;
+    })
 
     this.option = {
       tooltip: {},
       legend: {
-        data: ['销量']
+        data: ['Expenses']
       },
       xAxis: {
-        data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+        data: this.xData//["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
       },
       yAxis: {},
       series: [{
         name: '销量',
         type: 'bar',
-        data: [5, 20, 36, 10, 10, 20]
+        data: this.yData//[5, 20, 36, 10, 10, 20]
       }]
     };
     this.optionPie = {
@@ -61,7 +78,7 @@ export class HomeBudgetComponent implements OnInit {
       legend: {
         orient: 'vertical',
         left: 10,
-        data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+        data: this.xData//['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
       },
       series: [
         {
@@ -83,20 +100,14 @@ export class HomeBudgetComponent implements OnInit {
           labelLine: {
             show: false
           },
-          data: [
-            { value: 335, name: '直接访问' },
-            { value: 310, name: '邮件营销' },
-            { value: 234, name: '联盟广告' },
-            { value: 135, name: '视频广告' },
-            { value: 1548, name: '搜索引擎' }
-          ]
+          data: xy
         }
       ]
     };
     this.budgetUsage = { 
       series: [
         {
-            name: '业务指标',
+            name: 'Budget',
             type: 'gauge',  
             center:['50%', '40%'],        
             axisLine: {
@@ -140,12 +151,21 @@ export class HomeBudgetComponent implements OnInit {
   isBar() {    
     this.showBar = true;
   }
-  showPie() {
+  isPie() {
     this.showBar=false; 
+  }
+  isCategory(){
+    this.showCategory=true;
+  }
+  isDate(){
+    this.showCategory=false;
   }
   keyUp(){
     // this.clickAdd=true;
     let newData = {categroy:"expenses",value:2};
     this.categories.push(newData)
+  }
+  showExpensesDetail(){  
+    this.showExpenseDetail=true;  
   }
 }
