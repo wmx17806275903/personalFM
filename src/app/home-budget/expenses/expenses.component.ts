@@ -21,6 +21,7 @@ export class ExpensesComponent implements OnInit {
   public categories:object[]=[];
   available: any;
   newexpenseDetail: any;
+  public header:string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36";
 
   constructor(public httpDomain:HttpDomainService) { }
 
@@ -187,11 +188,17 @@ export class ExpensesComponent implements OnInit {
   addItem(e){
     this.showExpenseDetail[e]=true;
   }
-  insertItem(e){
+  insertItem(){
     var api_putExpense="expenses/add_expense";
     //let newData = {categroyName:""};
-    let t=[{categoryName:e}];
-    console.log(e)
+    let t=[
+      {
+        categoryName:"",
+        expensesDetail:{bill:false,categroyName:"test",date:'',description:"test",paid:false,value:2},
+        totalValue:0
+      }
+    ];
+    //console.log("11111"+e)
     this.expenseDetail.push(t)
     this.httpDomain.post(api_putExpense,t).then((response)=>{
       this.newexpenseDetail=response;
