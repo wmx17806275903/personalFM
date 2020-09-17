@@ -1,59 +1,44 @@
 import { Component, OnInit } from '@angular/core';
-import { NgxEchartsModule } from 'ngx-echarts';
-
-import { DateTimes } from '../utils/date-time';
-import {HttpDomainService} from "../services/http-domain.service";
-import { getCurrencySymbol } from '@angular/common';
-
+import { HttpDomainService } from 'src/app/services/http-domain.service';
+import { DateTimes } from '../../utils/date-time';
+import { HttpHeaders } from '@angular/common/http';
 @Component({
-  selector: 'app-home-budget',
-  templateUrl: './home-budget.component.html',
-  styleUrls: ['./home-budget.component.css']
+  selector: 'app-expenses',
+  templateUrl: './expenses.component.html',
+  styleUrls: ['./expenses.component.css']
 })
-export class HomeBudgetComponent implements OnInit {
-  public title = "HomeBudget";
+export class ExpensesComponent implements OnInit {
+  public expenseDetail: any;
   public showBar = true;
   public showCategory=true;
   public showExpenseDetail:boolean[]=[false];
   public option;
   public optionPie;
   public budgetUsage;
-  public expenseDetail;
   public home:any;
+  public day:any;
   public clickAdd=false;
-  public day : string;
-  public available:any;
-  public domain:string;
-  public categories:object[]=[
-    {categroy:"expenses",value:2},
-    {categroy:"budget",value:3},
-    {categroy:"income",value:4}
-  ];
-  public details:object[]=[
-    {category:"Rent",insideItems:[{category:"Mortage",value:"$1700"}],value:"$1700"},
-    {category:"utilitiest",insideItems:[{category:"Electricity",value:"$300"},{category:"Water",value:"$100"}],value:"$211"}
-  ];
+  public categories:object[]=[];
+  available: any;
+  newexpenseDetail: unknown;
 
-  constructor(public httpDomain:HttpDomainService){
-    this.domain=httpDomain.domain;//can use for add img.
-  }
+  constructor(public httpDomain:HttpDomainService) { }
 
   ngOnInit(): void {
     this.day=DateTimes.format(new Date(),'yyyy-MM-dd');
-
     var api_expense="expenses/details";
+
     var xData:any[] = [];
     var yData:any[] = [];
     const xy: any[] = [];
     this.httpDomain.get(api_expense).then((response)=>{
       this.expenseDetail=response;
-      console.log(this.expenseDetail)
+      console.log(this.expenseDetail) 
       for(var i=0;i<this.expenseDetail.length;i++){
         xy.push({ name: this.expenseDetail[i]["categoryName"], value: this.expenseDetail[i]["totalValue"] });
         xData.push(this.expenseDetail[i]["categoryName"]);
         yData.push(this.expenseDetail[i]["totalValue"]);
-      }
-      console.log(xy)
+      }    
     })
     var api_home="/home"
     this.httpDomain.get(api_home).then((response)=>{
@@ -71,6 +56,62 @@ export class HomeBudgetComponent implements OnInit {
       }
       this.available=budgetValue-expValue;
     })
+    this.option = {
+      tooltip: {},
+      legend: {
+        data: ['Expenses']
+      },
+      xAxis: {
+        data: xData//["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+      },
+      yAxis: {},
+      series: [{        
+        name: 'Expense',
+        type: 'bar',
+        itemStyle:{
+          color:'#3399FF',
+        },
+        data: yData,//[5, 20, 36, 10, 10, 20]
+        showBackground: true,
+        backgroundStyle: {
+            color: 'rgba(00, 00, 00, 0.8)'
+        }
+      }]
+    };
+    this.optionPie = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b}: {c} ({d}%)'
+      },
+      legend: {
+        orient: 'vertical',
+        left: 10,
+        data: xData//['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+      },
+      series: [
+        {          
+          name: 'Expense',
+          type: 'pie',
+          radius: ['50%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '30',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: xy
+        }
+      ]
+    };
     this.budgetUsage = { 
       series: [
         {
@@ -105,6 +146,7 @@ export class HomeBudgetComponent implements OnInit {
         }
     ]      
     };
+
   }
   handleVisibleRent(e) {
     console.log(e)
@@ -134,11 +176,33 @@ export class HomeBudgetComponent implements OnInit {
   showExpensesDetail(e){  
     this.showExpenseDetail[e]=true;  
   }
-  insertItem(){
-    let newData = {categroyName:""};
-    this.expenseDetail.push(newData)
+  addItem(e){
+    this.showExpenseDetail[e]=true;
+  }
+  insertItem(e){
+    var api_putExpense="expenses/add_expense";
+    //let newData = {categroyName:""};
+    let t=[{categoryName:e}];
+    console.log(e)
+    this.expenseDetail.push(t)
+    this.httpDomain.post(api_putExpense,t).then((response)=>{
+      this.newexpenseDetail=response;
+      console.log(this.newexpenseDetail)     
+    })
   }
   deleteItem(i){
+    var api_delExpense="expenses/delete_expense/";
     this.expenseDetail.splice(i)
+    const options={
+      headers:new HttpHeaders({
+        'Content-Type':'application/json',
+      }),
+    };
+    // this.httpDomain.delete(api_delExpense).then((response)=>{
+    //   this.expenseDetail=response;
+    //   console.log(this.expenseDetail)
+    // })
+    
   }
 }
+

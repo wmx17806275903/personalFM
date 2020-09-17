@@ -23,6 +23,17 @@ export class HttpDomainService {
       }, (error) => {
         reject(error);
       })
-    })
+    })    
+  }
+  delete(api){
+    /*
+      return new Promise((resolve,reject)=>{
+        this.http.delete(this.domain+api).subscribe(response=>{
+          resolve(response);
+        }, (error) => {
+          reject(error);
+        })
+    })*/
+    
   }
 }
