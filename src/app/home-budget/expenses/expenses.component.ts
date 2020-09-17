@@ -178,8 +178,8 @@ export class ExpensesComponent implements OnInit {
   }
   keyUp(){
     // this.clickAdd=true;
-    let newData = {categroy:"expenses",value:2};
-    this.categories.push(newData)
+    let newData = {bill:false,categroyName:"test",date:'',description:"test",paid:false,value:2};
+    this.expenseDetail.push({expensesItems:newData})
   }
   showExpensesDetail(e){  
     this.showExpenseDetail[e]=true;  
