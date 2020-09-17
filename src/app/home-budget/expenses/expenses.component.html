@@ -54,7 +54,7 @@
             <div class="col">
             <div class="card-header" *ngIf="showCategory">
             <ul class="nav flex-column mb-2" *ngFor="let item of expenseDetail;let i=index">
-                <li ng-dblclick="addItem()" contentEditable="true" class="sidebar-heading d-flex justify-content-between align-items-center btn btn-dark dropdown-toggle" (click)="handleVisibleRent(i)" (contextmenu)="deleteItem(i)">                             
+                <li ng-dblclick="keyUp()" contentEditable="true" class="sidebar-heading d-flex justify-content-between align-items-center btn btn-dark dropdown-toggle" (click)="handleVisibleRent(i)" (contextmenu)="deleteItem(i)">                             
                 <a style="color:#fff;">{{item.categoryName}}</a>                 
                 </li>
                 <div *ngIf="showExpenseDetail[i]">
