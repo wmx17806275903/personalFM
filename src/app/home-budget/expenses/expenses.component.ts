@@ -20,7 +20,7 @@ export class ExpensesComponent implements OnInit {
   public clickAdd=false;
   public categories:object[]=[];
   available: any;
-  newexpenseDetail: unknown;
+  newexpenseDetail: any;
 
   constructor(public httpDomain:HttpDomainService) { }
 
@@ -28,6 +28,8 @@ export class ExpensesComponent implements OnInit {
     this.day=DateTimes.format(new Date(),'yyyy-MM-dd');
     var api_expense="expenses/details";
 
+    var budgetBalance:number=0;
+    const balance:any[]=[];
     var xData:any[] = [];
     var yData:any[] = [];
     const xy: any[] = [];
@@ -55,6 +57,13 @@ export class ExpensesComponent implements OnInit {
         }
       }
       this.available=budgetValue-expValue;
+      if(this.available<0){
+        budgetBalance=10;
+      }else{
+        budgetBalance=(this.available/budgetValue)*100;
+      }
+      balance.push({value: budgetBalance, name: '%'})  
+      console.log(balance,budgetBalance); 
     })
     this.option = {
       tooltip: {},
@@ -130,15 +139,14 @@ export class ExpensesComponent implements OnInit {
 	                color:'#b0b3b8'
 	            }
 	        },
-          data: [{value: 10, name: '%'}],   
+          data: balance,   
 	        detail: {//仪表盘详情数据相关
 	            textStyle: {
                     color: '#5bdbff',
                     fontSize:16,
                     offsetCenter: [0,'80%']
                }
-	        },
-	        
+	        },	        
 	        pointer:{//指针长度与宽度
 	            width:3,
 	            length:'85%'
